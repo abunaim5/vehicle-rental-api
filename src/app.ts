@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express";
 import initDB from "./config/db";
 import { userRoutes } from "./modules/user/user.routes";
+import { authRoutes } from "./modules/auth/auth.routes";
 const app = express();
 
 // middleware (json parser)
@@ -9,7 +10,10 @@ app.use(express.json());
 // initializing database
 initDB();
 
-// users apis
+// auth related api
+app.use('/api/v1/auth', authRoutes);
+
+// users related api
 app.use('/api/v1/users', userRoutes);
 
 app.get('/', (_: Request, res: Response) => {
