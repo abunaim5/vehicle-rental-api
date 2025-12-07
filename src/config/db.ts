@@ -1,8 +1,8 @@
 import pg, { Pool } from "pg";
 import config from ".";
 
-const pool = new Pool({
-    connectionString: config.db_connection_str
+export const pool = new Pool({
+    connectionString: `${config.db_connection_str}`
 });
 
 const initDB = async () => {
@@ -20,6 +20,17 @@ const initDB = async () => {
                 CONSTRAINT password_min_length CHECK (LENGTH(password) >= 6)
             )
         `);
+
+        // await pool.query(`
+        //         CREATE TABLE IF NOT EXISTS vehicles(
+        //             id SERIAL PRIMARY KEY,
+        //             vehicle_name TEXT NOT NULL,
+        //             type TEXT NOT NULL,
+        //             registration_number NOT NULL UNIQUE,
+        //             daily_rent_price TEXT NOT NULL,
+        //             availability_status TEXT NOT NULL
+        //         )
+        //     `);
 };
 
 export default initDB;
