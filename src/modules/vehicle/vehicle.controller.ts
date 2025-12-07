@@ -17,6 +17,76 @@ const VehicleController = {
                 message: err.message
             });
         }
+    },
+
+    getVehicles: async (_: Request, res: Response) => {
+        try {
+            const result = await VehicleService.getVehicles();
+
+            res.status(200).json({
+                success: true,
+                message: !result.rows.length ? "No vehicles found" : "Vehicles retrieved successfully",
+                data: result.rows
+            });
+        } catch (err: any) {
+            res.status(500).json({
+                success: false,
+                message: err.message
+            });
+        }
+    },
+
+    getSingleVehicle: async (req: Request, res: Response) => {
+        const vehicleId = req.params.vehicleId;
+
+        try {
+            const result = await VehicleService.getSingleVehicle(vehicleId as string);
+
+            if (!result.rows.length) {
+                res.status(404).json({
+                    success: false,
+                    message: "Vehicle Not Found",
+                });
+            } else {
+                res.status(200).json({
+                    success: true,
+                    message: "Vehicle retrieved successfully",
+                    data: result.rows[0]
+                });
+            }
+
+        } catch (err: any) {
+            res.status(500).json({
+                success: false,
+                message: err.message
+            });
+        }
+    },
+
+    updateVehicle: async (req: Request, res: Response) => {
+        const vehicleId = req.params.vehicleId;
+        
+        try {
+            const result = await VehicleService.updateVehicle(req.body, vehicleId as string);
+
+            if (!result.rows.length) {
+                res.status(404).json({
+                    success: false,
+                    message: "Vehicle Not Found"
+                });
+            } else {
+                res.status(200).json({
+                    success: true,
+                    message: "Vehicle updated successfully",
+                    data: result.rows[0]
+                });
+            }
+        } catch (err: any) {
+            res.status(500).json({
+                success: false,
+                message: err.message
+            });
+        }
     }
 };
 
