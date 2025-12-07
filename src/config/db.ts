@@ -21,16 +21,19 @@ const initDB = async () => {
             )
         `);
 
-        // await pool.query(`
-        //         CREATE TABLE IF NOT EXISTS vehicles(
-        //             id SERIAL PRIMARY KEY,
-        //             vehicle_name TEXT NOT NULL,
-        //             type TEXT NOT NULL,
-        //             registration_number NOT NULL UNIQUE,
-        //             daily_rent_price TEXT NOT NULL,
-        //             availability_status TEXT NOT NULL
-        //         )
-        //     `);
+    await pool.query(`
+                CREATE TABLE IF NOT EXISTS vehicles(
+                    id SERIAL PRIMARY KEY,
+                    vehicle_name TEXT NOT NULL,
+                    type TEXT NOT NULL,
+                    registration_number TEXT NOT NULL UNIQUE,
+                    daily_rent_price INT NOT NULL,
+                    availability_status TEXT NOT NULL,
+                    CONSTRAINT vehicle_type CHECK (type IN ('car', 'bike', 'van', 'SUV')),
+                    CONSTRAINT daily_rent_price_positive CHECK (daily_rent_price > 0),
+                    CONSTRAINT vehicle_availability_status CHECK (availability_status IN ('available', 'booked'))
+                )
+            `);
 };
 
 export default initDB;
