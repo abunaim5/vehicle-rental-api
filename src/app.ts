@@ -3,6 +3,7 @@ import initDB from "./config/db";
 import { userRoutes } from "./modules/user/user.routes";
 import { authRoutes } from "./modules/auth/auth.routes";
 import { vehicleRoutes } from "./modules/vehicle/vehicle.routes";
+import { bookingRoutes } from "./modules/booking/booking.routes";
 const app = express();
 
 // middleware (json parser)
@@ -19,6 +20,9 @@ app.use('/api/v1/users', userRoutes);
 
 // vehicles related api
 app.use('/api/v1/vehicles', vehicleRoutes);
+
+// bookings related api
+app.use('/api/v1/bookings', bookingRoutes);
 
 app.get('/', (_: Request, res: Response) => {
     res.send('Vehicle Rental Server API is Running!');

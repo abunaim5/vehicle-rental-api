@@ -8,5 +8,6 @@ router
     .get('/', VehicleController.getVehicles)
     .get('/:vehicleId', VehicleController.getSingleVehicle)
     .put('/:vehicleId', VehicleController.updateVehicle)
+    .delete('/:vehicleId', VehicleController.deleteVehicle);
 
 export const vehicleRoutes = router;

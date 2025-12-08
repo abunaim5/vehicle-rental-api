@@ -37,6 +37,15 @@ const VehicleService = {
         );
 
         return res;
+    },
+
+    deleteVehicle: async (vehicleId: string) => {
+        const res = await pool.query(
+            `DELETE FROM vehicles WHERE id = $1`,
+            [vehicleId]
+        );
+
+        return res;
     }
 };
 

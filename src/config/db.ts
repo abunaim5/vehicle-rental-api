@@ -22,18 +22,32 @@ const initDB = async () => {
         `);
 
     await pool.query(`
-                CREATE TABLE IF NOT EXISTS vehicles(
-                    id SERIAL PRIMARY KEY,
-                    vehicle_name TEXT NOT NULL,
-                    type TEXT NOT NULL,
-                    registration_number TEXT NOT NULL UNIQUE,
-                    daily_rent_price INT NOT NULL,
-                    availability_status TEXT NOT NULL,
-                    CONSTRAINT vehicle_type CHECK (type IN ('car', 'bike', 'van', 'SUV')),
-                    CONSTRAINT daily_rent_price_positive CHECK (daily_rent_price > 0),
-                    CONSTRAINT vehicle_availability_status CHECK (availability_status IN ('available', 'booked'))
-                )
-            `);
+            CREATE TABLE IF NOT EXISTS vehicles(
+                id SERIAL PRIMARY KEY,
+                vehicle_name TEXT NOT NULL,
+                type TEXT NOT NULL,
+                registration_number TEXT NOT NULL UNIQUE,
+                daily_rent_price INT NOT NULL,
+                availability_status TEXT NOT NULL,
+                CONSTRAINT vehicle_type CHECK (type IN ('car', 'bike', 'van', 'SUV')),
+                CONSTRAINT daily_rent_price_positive CHECK (daily_rent_price > 0),
+                CONSTRAINT vehicle_availability_status CHECK (availability_status IN ('available', 'booked'))
+            )
+        `);
+
+    await pool.query(`
+            CREATE TABLE IF NOT EXISTS bookings(
+                id SERIAL PRIMARY KEY,
+                customer_id INT REFERENCES users(id) ON DELETE CASCADE,
+                vehicle_id INT REFERENCES vehicles(id) ON DELETE CASCADE,
+                rent_start_date DATE NOT NULL,
+                rent_end_date DATE NOT NULL,
+                total_price INT NOT NULL CHECK (total_price > 0),
+                status TEXT NOT NULL DEFAULT 'active',
+                CONSTRAINT booking_status CHECK (status IN ('active', 'cancelled', 'returned')),
+                CONSTRAINT rent_date_check CHECK (rent_end_date > rent_start_date)
+            )
+        `);
 };
 
 export default initDB;
