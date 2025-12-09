@@ -1,3 +1,4 @@
+import { JwtPayload } from "jsonwebtoken";
 import { pool } from "../../config/db";
 
 const BookingService = {
@@ -33,10 +34,10 @@ const BookingService = {
         return { vehicleRes, res };
     },
 
-    getBookings: async () => {
+    getBookings: async ({ id: userId, role }: JwtPayload) => {
         const { rows: users } = await pool.query(`SELECT id, name, email, role FROM users`);
 
-        const { rows: bookings } = await pool.query(`SELECT * FROM bookings`);
+        const { rows: bookings } = await pool.query(role === 'admin' ? `SELECT * FROM bookings` : `SELECT * FROM bookings WHERE customer_id = $1`, role === 'admin' ? [] : [userId]);
 
         const { rows: vehicles } = await pool.query(`SELECT id, vehicle_name, registration_number, type FROM vehicles`);
 

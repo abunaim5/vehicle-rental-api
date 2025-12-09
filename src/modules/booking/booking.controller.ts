@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import BookingService from "./booking.service";
+import { JwtPayload } from "jsonwebtoken";
 
 const BookingController = {
     createBooking: async (req: Request, res: Response) => {
@@ -31,9 +32,12 @@ const BookingController = {
         }
     },
 
-    getBookings: async (_: Request, res: Response) => {
+    getBookings: async (req: Request, res: Response) => {
+        const user = req?.user;
+        console.log(user);
+
         try {
-            const result = await BookingService.getBookings();
+            const result = await BookingService.getBookings(user as JwtPayload);
 
             res.status(200).json({
                 success: true,
