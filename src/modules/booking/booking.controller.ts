@@ -12,6 +12,11 @@ const BookingController = {
                     success: false,
                     message: 'Vehicle Not Found'
                 });
+            } else if (vehicleRes.rows[0].availability_status === 'booked') {
+                res.status(409).json({
+                    success: false,
+                    message: "Vehicle is already booked"
+                });
             } else {
                 res.status(201).json({
                     success: true,

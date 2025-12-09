@@ -95,7 +95,13 @@ const VehicleController = {
         try {
             const result = await VehicleService.deleteVehicle(vehicleId as string);
 
-            if (!result.rowCount) {
+            if (!result) {
+                res.status(409).json({
+                    success: false,
+                    message: "Cannot delete vehicle with active bookings",
+                    error: "Active booking exist"
+                });
+            } else if (!result.rowCount) {
                 res.status(404).json({
                     success: false,
                     message: "Vehicle Not Found"

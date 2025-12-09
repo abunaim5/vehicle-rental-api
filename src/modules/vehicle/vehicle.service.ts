@@ -40,6 +40,15 @@ const VehicleService = {
     },
 
     deleteVehicle: async (vehicleId: string) => {
+        const vehicleRes = await pool.query(
+            `SELECT availability_status FROM vehicles WHERE id = $1`,
+            [vehicleId]
+        );
+
+        if (vehicleRes.rows[0].availability_status === 'booked') {
+            return null;
+        }
+
         const res = await pool.query(
             `DELETE FROM vehicles WHERE id = $1`,
             [vehicleId]

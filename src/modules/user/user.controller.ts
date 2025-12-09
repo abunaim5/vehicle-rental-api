@@ -52,7 +52,13 @@ const UserController = {
         try {
             const result = await UserService.deleteUser(userId as string);
 
-            if (!result.rowCount) {
+            if (!result) {
+                res.status(409).json({
+                    success: false,
+                    message: "Cannot delete user with active bookings",
+                    error: "Active booking exist"
+                });
+            } else if (!result.rowCount) {
                 res.status(404).json({
                     success: false,
                     message: "User Not Found"

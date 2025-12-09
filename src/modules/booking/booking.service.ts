@@ -6,13 +6,17 @@ const BookingService = {
         const { customer_id, vehicle_id, rent_start_date, rent_end_date } = payload;
 
         const vehicleRes = await pool.query(
-            `SELECT vehicle_name, daily_rent_price FROM vehicles WHERE id = $1`,
+            `SELECT vehicle_name, daily_rent_price, availability_status FROM vehicles WHERE id = $1`,
             [vehicle_id]
         );
 
         if (!vehicleRes.rows.length) {
             return { vehicleRes };
         };
+
+        if (vehicleRes.rows[0].availability_status === 'booked') {
+            return { vehicleRes }
+        }
 
         const startDate = new Date(rent_start_date as string);
         const endDate = new Date(rent_end_date as string);
@@ -45,7 +49,7 @@ const BookingService = {
             const user = users.find(user => user.id === booking.customer_id) || null;
             const vehicle = vehicles.find(vehicle => vehicle.id === booking.vehicle_id) || null;
 
-            if (user.role === 'admin') {
+            if (role === 'admin') {
                 return {
                     ...booking,
                     customer: user ? { name: user.name, email: user.email } : null,
@@ -64,7 +68,7 @@ const BookingService = {
                     type: vehicle.type
                 } : null
             }
-        })
+        });
 
         return res;
     },

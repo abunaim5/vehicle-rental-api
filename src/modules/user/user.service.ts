@@ -21,6 +21,14 @@ const UserService = {
     },
 
     deleteUser: async (userId: string) => {
+        const bookingRes = await pool.query(`SELECT customer_id FROM bookings`);
+        const customerIds = new Set(bookingRes.rows.map(booking => booking.customer_id));
+        // console.log(customerIds, customerIds.has(parseInt(userId)));
+
+        if (customerIds.has(parseInt(userId))) {
+            return null;
+        }
+
         const res = await pool.query(
             `DELETE FROM users WHERE id = $1`,
             [userId]
