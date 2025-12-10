@@ -75,13 +75,14 @@ const BookingService = {
 
     updateBooking: async (payload: Record<string, unknown>, user: JwtPayload, bookingId: string) => {
         const { status } = payload;
-
+        
         const bookingRes = await pool.query(
             `SELECT rent_start_date, vehicle_id FROM bookings WHERE id = $1`,
             [bookingId]
         );
         const booking = bookingRes.rows[0];
         if (!booking) return null;
+        console.log(status, user, bookingId)
 
         const rentStartDate = booking.rent_start_date;
 
@@ -103,7 +104,7 @@ const BookingService = {
 
         if (status === 'returned') {
             await pool.query(
-                `UPDATE vehicles SET availability_status = $1 WHERE id = $2 RETURNING *`,
+                `UPDATE vehicles SET availability_status = $1 WHERE id = $2`,
                 ["available", booking.vehicle_id]
             );
 

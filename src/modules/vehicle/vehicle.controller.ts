@@ -69,7 +69,12 @@ const VehicleController = {
         try {
             const result = await VehicleService.updateVehicle(req.body, vehicleId as string);
 
-            if (!result.rows.length) {
+            if (!result) {
+                res.status(200).json({
+                    success: true,
+                    message: "Nothing to update"
+                });
+            } else if (!result.rows.length) {
                 res.status(404).json({
                     success: false,
                     message: "Vehicle Not Found"

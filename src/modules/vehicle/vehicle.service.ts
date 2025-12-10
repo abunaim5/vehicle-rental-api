@@ -29,14 +29,26 @@ const VehicleService = {
     },
 
     updateVehicle: async (payload: Record<string, unknown>, vehicleId: string) => {
-        const { vehicle_name, type, registration_number, daily_rent_price, availability_status } = payload;
+        const fields: string[] = [];
+        const values: unknown[] = [];
+        let idx = 1;
 
-        const res = await pool.query(
-            `UPDATE vehicles SET vehicle_name = $1, type = $2, registration_number = $3, daily_rent_price = $4, availability_status = $5 WHERE id = $6 RETURNING *`,
-            [vehicle_name, type, registration_number, daily_rent_price, availability_status, vehicleId]
+        if (!fields.length) return null;
+
+        for (const key in payload) {
+            fields.push(`${key} = $${idx}`);
+            values.push(payload[key]);
+            idx++;
+        }
+
+        values.push(vehicleId);
+
+        const updatedRes = await pool.query(
+            `UPDATE vehicles SET ${fields.join(', ')} WHERE id = $${idx} RETURNING *`,
+            values
         );
 
-        return res;
+        return updatedRes;
     },
 
     deleteVehicle: async (vehicleId: string) => {

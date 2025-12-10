@@ -10,7 +10,7 @@ const AuthService = {
         const hashedPassword = await bcrypt.hash(password as string, 10);
 
         const res = await pool.query(
-            `INSERT INTO users(name, email, password, phone, role) VALUES($1, $2, $3, $4, $5) RETURNING *`,
+            `INSERT INTO users(name, email, password, phone, role) VALUES($1, $2, $3, $4, $5) RETURNING id, name, email, phone, role, created_at, updated_at`,
             [name, email, hashedPassword, phone, role]
         );
 
@@ -31,11 +31,11 @@ const AuthService = {
 
         if (!matched) return false;
 
-        const token = jwt.sign({id: user.id, name: user.name, email: user.email, role: user.role }, config.jwt_secret as string, {
+        const token = jwt.sign({ id: user.id, name: user.name, email: user.email, role: user.role }, config.jwt_secret as string, {
             expiresIn: "7d"
         });
 
-        return { token, user };
+        return { token: token, user: { id: user.id, name: user.name, email: user.email, phone: user.phone, role: user.role, created_at: user.created_at, updated_at: user.updated_at } };
     }
 };
 
