@@ -61,24 +61,28 @@ const BookingController = {
         const bookingId = req.params.bookingId;
 
         try {
-            const result = await BookingService.updateBooking(req.body, bookingId as string);
+            const result = await BookingService.updateBooking(req.body, req.user as JwtPayload, bookingId as string);
 
             if (!result) {
                 res.status(404).json({
                     success: false,
-                    message: "Booking Not Found"
-                });
-            } else {
-                res.status(200).json({
-                    success: true,
-                    message: result.status === 'cancelled' ? 'Booking cancelled successfully' : 'Booking marked as returned. Vehicle is now available',
-                    data: result
+                    message: "Booking not found or update not allowed"
                 });
             }
+
+            let message = result.status === 'cancelled' ? "Booking cancelled successfully" :
+                result.status === 'returned' ? "Booking marked as returned. Vehicle is now available" :
+                    "Booking update successfully";
+
+            res.status(200).json({
+                success: true,
+                message: message,
+                data: result
+            });
         } catch (err: any) {
             res.status(500).json({
                 success: false,
-                message: err.message
+                message: err.message || "Internal server error"
             });
         }
     }

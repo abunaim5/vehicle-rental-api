@@ -73,33 +73,49 @@ const BookingService = {
         return res;
     },
 
-    updateBooking: async (payload: Record<string, unknown>, bookingId: string) => {
+    updateBooking: async (payload: Record<string, unknown>, user: JwtPayload, bookingId: string) => {
         const { status } = payload;
-        console.log(status, bookingId);
 
-        const res = await pool.query(
+        const bookingRes = await pool.query(
+            `SELECT rent_start_date, vehicle_id FROM bookings WHERE id = $1`,
+            [bookingId]
+        );
+        const booking = bookingRes.rows[0];
+        if (!booking) return null;
+
+        const rentStartDate = booking.rent_start_date;
+
+        if (user.role === 'customer') {
+            const currentDate = new Date();
+            if (currentDate.getTime() > rentStartDate.getTime()) {
+                return null;
+            }
+        }
+
+        const updatedRes = await pool.query(
             `UPDATE bookings SET status = $1 WHERE id = $2 RETURNING *`,
             [status, bookingId]
         );
 
 
-        if (!res.rows.length) return null;
+        const updatedBooking = updatedRes.rows[0];
+        if (!updatedBooking) return null;
 
-        await pool.query(
-            `UPDATE vehicles SET availability_status = $1 WHERE id = $2 RETURNING *`,
-            ["available", res.rows[0].vehicle_id]
-        );
+        if (status === 'returned') {
+            await pool.query(
+                `UPDATE vehicles SET availability_status = $1 WHERE id = $2 RETURNING *`,
+                ["available", booking.vehicle_id]
+            );
 
-        if (res.rows[0].status === 'returned') {
             return {
-                ...res.rows[0],
+                ...updatedBooking,
                 vehicle: {
                     availability_status: 'available'
                 }
             }
         }
 
-        return res.rows[0];
+        return updatedBooking;
     }
 };
 
