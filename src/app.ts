@@ -4,6 +4,7 @@ import { userRoutes } from "./modules/user/user.routes";
 import { authRoutes } from "./modules/auth/auth.routes";
 import { vehicleRoutes } from "./modules/vehicle/vehicle.routes";
 import { bookingRoutes } from "./modules/booking/booking.routes";
+import globalErrorHandler from "./middleware/errorHandler";
 const app = express();
 
 // middleware (json parser)
@@ -27,5 +28,7 @@ app.use('/api/v1/bookings', bookingRoutes);
 app.get('/', (_: Request, res: Response) => {
     res.send('Vehicle Rental Server API is Running!');
 });
+
+app.use(globalErrorHandler); 
 
 export default app;
