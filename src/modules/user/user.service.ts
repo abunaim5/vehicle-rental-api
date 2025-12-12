@@ -10,11 +10,21 @@ const UserService = {
     },
 
     updateUser: async (payload: Record<string, unknown>, userId: string) => {
-        const { name, email, phone, role } = payload;
+        const fields: string[] = [];
+        const values: unknown[] = [];
+        let idx = 1;
+
+        for (const key in payload) {
+            fields.push(`${key} = $${idx}`);
+            values.push(payload[key]);
+            idx++;
+        };
+
+        values.push(userId);
 
         const res = await pool.query(
-            `UPDATE users SET name = $1, email = $2, phone = $3, role = $4 WHERE id = $5 RETURNING id, name, email, phone, role, created_at, updated_at`,
-            [name, email, phone, role, userId]
+            `UPDATE users SET ${fields.join(', ')} WHERE id = $${idx} RETURNING id, name, email, phone, role, created_at, updated_at`,
+            values
         );
 
         return res;

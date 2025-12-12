@@ -6,13 +6,14 @@ const BookingController = {
     createBooking: async (req: Request, res: Response) => {
         try {
             const { res: createRes, vehicleRes } = await BookingService.createBooking(req.body);
+            const vehicle = vehicleRes.rows[0];
 
             if (!vehicleRes?.rows.length) {
                 res.status(404).json({
                     success: false,
                     message: 'Vehicle Not Found'
                 });
-            } else if (vehicleRes.rows[0].availability_status === 'booked') {
+            } else if (vehicle.availability_status === 'booked') {
                 res.status(409).json({
                     success: false,
                     message: "Vehicle is already booked"
@@ -24,7 +25,8 @@ const BookingController = {
                     data: {
                         ...createRes?.rows[0],
                         vehicle: {
-                            ...vehicleRes?.rows[0]
+                            vehicle_name: vehicle.vehicle_name,
+                            daily_rent_price: vehicle.daily_rent_price
                         }
                     }
                 });
@@ -39,7 +41,6 @@ const BookingController = {
 
     getBookings: async (req: Request, res: Response) => {
         const user = req?.user;
-        console.log(user);
 
         try {
             const result = await BookingService.getBookings(user as JwtPayload);
