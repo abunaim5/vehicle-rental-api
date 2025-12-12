@@ -39,7 +39,21 @@ const BookingService = {
     },
 
     getBookings: async ({ id: userId, role }: JwtPayload) => {
-        
+        const expiredBookings = await pool.query(
+            `SELECT id, vehicle_id FROM bookings WHERE rent_end_date < NOW() AND status != 'returned'`
+        );
+
+        for (const booking of expiredBookings.rows) {
+            await pool.query(
+                `UPDATE bookings SET status = $1 WHERE id = $2`,
+                ['returned', booking.id]
+            );
+
+            await pool.query(
+                `UPDATE vehicles SET availability_status = $1 WHERE id = $2`,
+                ['available', booking.vehicle_id]
+            )
+        };
 
         const { rows: bookings } = await pool.query(
             role === 'admin' ? `SELECT * FROM bookings` : `SELECT * FROM bookings WHERE customer_id = $1`,
