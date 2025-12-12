@@ -84,4 +84,4 @@ A modular, production-ready backend API for managing a complete Vehicle Rental S
 
 7. **API base endpoint:**
 
-    Open `http://localhost:5000/api/v1` in your browser.
+    `http://localhost:5000/api/v1`
