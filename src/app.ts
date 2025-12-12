@@ -26,9 +26,15 @@ app.use('/api/v1/vehicles', vehicleRoutes);
 app.use('/api/v1/bookings', bookingRoutes);
 
 app.get('/', (_: Request, res: Response) => {
-    res.send('Vehicle Rental Server API is Running!');
+    res.json({
+        status: 'ok',
+        name: 'Vehicle Rental System API',
+        version: 'v1',
+        docs: '/api/v1'
+    });
+    // res.send('Vehicle Rental Server API is Running!');
 });
 
-app.use(globalErrorHandler); 
+app.use(globalErrorHandler);
 
 export default app;
